@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using Sca.Api.Entities;
 
 namespace Sca.Api.Controllers
 {
@@ -10,11 +13,19 @@ namespace Sca.Api.Controllers
     [ApiController]
     public class ApplicantsController : ControllerBase
     {
-        // GET api/values
-        [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        private readonly DbContext db;
+
+        public ApplicantsController(DbContext context)
         {
-            return new string[] { "value1", "value2" };
+            db = context;
+        }
+
+        [HttpGet("org/{id}")]
+        public async Task<ActionResult> Get(string id)
+        {
+            var filter = new BsonDocument();
+            var data = await db.Applicants.Find(filter).ToListAsync();
+            return Ok(data);
         }
 
         // GET api/values/5
